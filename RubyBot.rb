@@ -13,7 +13,7 @@ class IRCBot
 		IRCcommands.set_class_vars(@@socket, channel, name)
 		IRCcommands.say "NICK #{name}"
 		IRCcommands.say "USER #{name} 0 * #{name}"
-		IRCcommands.say "JOIN ##{channel}"
+		IRCcommands.join_chan(@@channel)
 	end
 
 	def run
@@ -30,11 +30,11 @@ class IRCBot
 			if @inChan
 				Triggers.parse_message(message)
 			end
-
+			
 		end
 	end
 end
 
 name = 'testbot' + rand(1000000).to_s
-bot = IRCBot.new(name, "irc.rizon.net", 7000, 'rubybottest')
+bot = IRCBot.new(name, "irc.freenode.net", 6667, 'bptest')
 bot.run
