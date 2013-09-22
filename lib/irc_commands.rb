@@ -9,12 +9,13 @@ class IRCcommands
 	#say message to server
 	def self.say(message)
 		puts 'SERV >> ' + message
-		@@socket.puts message
+		@@socket.puts message +"\n"
 	end
 
 	#say message to specified channel
 	def self.say_in_chan(message)
-		say "PRIVMSG ##{@@channel} :#{message}"
+		puts 'MSG >> ' + message
+		@@socket.puts "PRIVMSG ##{@@channel} :#{message}\n"
 	end
 
 	#quit qith specified or default message
@@ -25,5 +26,9 @@ class IRCcommands
 
 	def self.pong
 		say 'PONG :pingis'
+	end
+
+	def self.join_chan(channel)
+		say "JOIN ##{channel}"
 	end
 end
