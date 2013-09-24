@@ -16,7 +16,7 @@ class Triggers
 		if message.include?("hi #{@name}")
 			hello
 		end
-
+		
 		if message.include?("now quit")
 			IRCcommands.quit('Quitting now!')
 		end
