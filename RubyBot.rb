@@ -1,7 +1,9 @@
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 require 'irc_commands'
 require 'triggers'
+#!/usr/bin/env ruby
 require 'socket'
+require 'sqlite3'
 
 class IRCBot
 
@@ -11,8 +13,9 @@ class IRCBot
 		@@socket = TCPSocket.open(server, port)
 		@inChan = false
 		IRCcommands.set_class_vars(@@socket, channel, name)
-		IRCcommands.say "NICK #{name}"
 		IRCcommands.say "USER #{name} 0 * #{name}"
+		IRCcommands.say "NICK #{name}"
+		IRCcommands.say "IDENTIFY #{ARGV[0]}"
 		IRCcommands.join_chan(@@channel)
 	end
 
@@ -20,6 +23,11 @@ class IRCBot
 		until @@socket.eof? do
 			message = @@socket.gets
 			puts 'SERV << ' + message
+
+			#Have to do this to load hostmask but whatever
+			if message.include?(':Password accepted') and @inChan == true
+				IRCcommands.cycle(@@channel)
+			end
 
 			#kind of a hackish way to determine but it works
 			if message.include?('366')
@@ -35,6 +43,5 @@ class IRCBot
 	end
 end
 
-name = 'testbot' + rand(1000000).to_s
-bot = IRCBot.new(name, "irc.freenode.net", 6667, 'bptest')
+bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'bptest')
 bot.run
