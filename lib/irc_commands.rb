@@ -31,4 +31,11 @@ class IRCcommands
 	def self.join_chan(channel)
 		say "JOIN ##{channel}"
 	end
+
+	def self.cycle(channel)
+		say "PART ##{channel}"
+		say "JOIN ##{channel}"
+	end
+
+
 end
