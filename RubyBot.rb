@@ -18,8 +18,7 @@ class IRCBot
 		IRCcommands.say "GHOST #{@@name} #{ARGV[0]}"
 		IRCcommands.say "IDENTIFY #{ARGV[0]}"
 		IRCcommands.join_chan(@@channel)
-		Database.setup_database(@@name)
-		#Database.test
+		Database.setup_database(@@name, ARGV[1])
 	end
 
 	def run
@@ -39,7 +38,7 @@ class IRCBot
 			end
 
 			if @inChan
-				Database.parse_message(message)
+				Triggers.parse_message(message)
 			end
 			
 		end
@@ -47,5 +46,5 @@ class IRCBot
 end
 
 
-bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'bptest')
+bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'lifting')
 bot.run
