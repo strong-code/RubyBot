@@ -1,3 +1,5 @@
+require 'database'
+
 class IRCcommands
 
 	def self.set_class_vars(socket, channel, name)
@@ -35,6 +37,10 @@ class IRCcommands
 	def self.cycle(channel)
 		say "PART ##{channel}"
 		say "JOIN ##{channel}"
+	end
+
+	def self.enabled_triggers
+		say_in_chan Database.get_enabled_from_table("Triggers")
 	end
 
 

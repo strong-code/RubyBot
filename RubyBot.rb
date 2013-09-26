@@ -1,9 +1,9 @@
+#!/usr/bin/env ruby
 $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
 require 'irc_commands'
 require 'triggers'
-#!/usr/bin/env ruby
 require 'socket'
-require 'sqlite3'
+require 'database'
 
 class IRCBot
 
@@ -15,8 +15,11 @@ class IRCBot
 		IRCcommands.set_class_vars(@@socket, channel, name)
 		IRCcommands.say "USER #{name} 0 * #{name}"
 		IRCcommands.say "NICK #{name}"
+		IRCcommands.say "GHOST #{@@name} #{ARGV[0]}"
 		IRCcommands.say "IDENTIFY #{ARGV[0]}"
 		IRCcommands.join_chan(@@channel)
+		Database.setup_database(@@name)
+		#Database.test
 	end
 
 	def run
@@ -36,12 +39,13 @@ class IRCBot
 			end
 
 			if @inChan
-				Triggers.parse_message(message)
+				Database.parse_message(message)
 			end
 			
 		end
 	end
 end
+
 
 bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'bptest')
 bot.run
