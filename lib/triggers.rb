@@ -1,6 +1,7 @@
 require 'irc_commands'
 require 'database'
 require 'link_grabber'
+require 'decision'
 
 class Triggers
 
@@ -10,7 +11,9 @@ class Triggers
 		"hi #{@name}" => proc { hello },
 		"now quit" => proc { quit },
 		"who is admin?" => proc { Database.is_admin?("#{@user}") },
-		"http" => proc { LinkGrabber.read_HTML(@msg) }
+		"http" => proc { LinkGrabber.read_HTML(@msg) },
+		"!decide" => proc { Decision.decide },
+		"!8ball" => proc { Decision.eight_ball }
 		}
 
 	def self.set_name(name)
