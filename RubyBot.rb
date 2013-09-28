@@ -26,6 +26,10 @@ class IRCBot
 			message = @@socket.gets
 			puts 'SERV << ' + message
 
+			if message.include?("PING")
+				IRCcommands.pong
+			end
+
 			#Have to do this to load hostmask but whatever
 			if message.include?(':Password accepted') and @inChan == true
 				IRCcommands.cycle(@@channel)
@@ -46,5 +50,5 @@ class IRCBot
 end
 
 
-bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'lifting')
+bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'bptest')
 bot.run
