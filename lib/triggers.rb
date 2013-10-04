@@ -30,7 +30,7 @@ class Triggers
 			@chan = @parts[2]
 			@msg = @parts[3..-1].join(" ")[1..-1]
 
-			puts "MSG << #{@msg}"
+			#puts "MSG << #{@msg}"
 
 			#search the message for triggers, and call proc
 			@triggers.each do |k, v|
