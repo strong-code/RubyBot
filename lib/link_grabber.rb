@@ -1,28 +1,30 @@
-require 'net/https'
-require 'URI'
+require 'net/http'
 require 'irc_commands'
 
 class LinkGrabber
 
-	def self.read_HTML(url)
+	#open and read HTML from a given url
+	def self.read_HTML(url, limit = 10)
+		url = url.sub(/^https/, "http") if url.include?("https")
 
-		if url.include?('https')
-			uri = URI.parse(url)
-			http = Net::HTTP.new(uri.host, uri.port)
-			http.use_ssl = true
-			http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-			request = Net::HTTP::Get.new(uri.request_uri)
-			request.basic_auth("username", "password")
-			response = http.request(request)
-			response = response.body
-			title = /<title>(.*)<\/title>/.match(response)[1]
+		raise ArgumentError, "Redirected more than #{10} times, failed to fetch html" if limit == 0
+
+		response = Net::HTTP.get_response(URI(url))
+
+		case response
+		when Net::HTTPSuccess then
+			html = response.read_body
+			title = /<title>(.*)<\/title>/.match(html)[1]
+			IRCcommands.say_in_chan("\x02Page Title:\x02 #{title}")
+		when Net::HTTPRedirection then
+			location = response['location']
+			puts "INFO >> Redirected to #{location}"
+			read_HTML(location, limit-1)
 		else
-			uri = URI(url)
-			response = Net::HTTP.get(uri)
-			title = /<title>(.*)<\/title>/.match(response)[1]
+			IRCcommands.say_in_chan("Unable to fetch page title for #{url}. Received #{response.value} instead :(")
+			puts "ERR >> Unable to reach #{url}. Received #{response.value}"
 		end
-
-		IRCcommands.say_in_chan("Page Title: #{title}")
 	end
+
 
 end
