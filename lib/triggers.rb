@@ -8,7 +8,7 @@ class Triggers
 	@triggers = {
 		"hi #{@name}" => proc { hello },
 		"now quit" => proc { quit },
-		"who is admin?" => proc { Database.is_admin?("#{@user}") },
+		"!admins" => proc { Database.active_admins },
 		"http" => proc { LinkGrabber.read_HTML(@msg) },
 		"!decide" => proc { Decision.decide(@msg) },
 		"!8ball" => proc { Decision.eight_ball }
@@ -22,13 +22,6 @@ class Triggers
 	def self.parse_message(message)
 
 		@parts = message.split
-
-		#new user has joined
-		# if message.include?("JOIN")
-		# 	user = @parts[0]
-		# 	name = /(.*)\!/.match(user).to_s.chomp("!")[1..-1]
-		# 	Database.user_has_greeting?(name)
-		# end
 
 		#regular channel message
 		if message.include?("PRIVMSG")
@@ -50,21 +43,19 @@ class Triggers
 
 	#respond to users in a personable manner
 	def self.hello
-		responses = ["hi", "hello", "sup", "hej", "hola", "yo"]
+		responses = ["hi", "hello", "sup", "hej", "hola", "yo", "hey"]
 		name = /(.*)\!/.match(@user).to_s.chomp("!")[1..-1]
 		IRCcommands.say_in_chan(responses.sample + " #{name}")
 	end
 
-
 	#quit with default message if nothing is supplied
 	def self.quit(quitmsg = "cya nerds")
-		IRCcommands.say_in_chan quitmsg
-		say "QUIT"
-	end
-
-	def self.add_greeting
-		parts = @msg.split
-		Database.add_user_greeting(parts[1], parts[3..-1].join)
+		if Database.is_admin?(@user)
+			IRCcommands.say_in_chan quitmsg
+			say "QUIT"
+		else
+			IRCcommands.say_in_chan("You aren't allowed to issue that command, sorry")
+		end
 	end
 
 end
