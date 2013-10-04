@@ -3,6 +3,7 @@ require 'database'
 require 'link_grabber'
 require 'decision'
 require 'define'
+require 'convert'
 
 class Triggers
 
@@ -11,10 +12,11 @@ class Triggers
 		["now quit"] => proc { quit },
 		["!admins"] => proc { Database.active_admins },
 		["http"] => proc { LinkGrabber.read_HTML(@msg) },
-		["!decide"] => proc { Decision.decide(@msg) },
+		["!decide", "!decide help"] => proc { Decision.decide(@msg) },
 		["!8ball"] => proc { Decision.eight_ball },
-		["weed", "pot", "ganja", "420", "marijuana"] => proc { four_twenty },
-		["!define"] => proc { Define.define(@msg) }
+		["weed ", "pot ", "ganja", "420", "marijuana", "blaze"] => proc { four_twenty },
+		["!define", "!define help"] => proc { Define.define(@msg) },
+		["!convert", "!convert help"] => proc { Conversion.convert(@msg) }
 		}
 
 	def self.set_name(name)

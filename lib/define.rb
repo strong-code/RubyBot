@@ -6,6 +6,8 @@ require 'irc_commands'
 class Define
 
 	def self.define(msg)
+		return help if msg.split[1] == "help"
+
 		#shouldnt hard code this in here but im laaaazy
 		api_key = "3c58717ad84d01e36b00300b24006cae5d071d3feb690edeb"
 		word = msg.split[1]
@@ -24,6 +26,13 @@ class Define
 		definition = definition[0..150] << "..." if definition.length > 150
 
 		IRCcommands.say_in_chan("\x02#{word}\x02: (#{part_of_speech}) #{definition}")
+	end
+
+	def self.help
+		help_doc = "Use \x02!define\x02 {word} to get both a definition and "\
+		"the part of speech for the supplied word."
+
+		IRCcommands.say_in_chan(help_doc)
 	end
 
 end
