@@ -5,14 +5,12 @@ require 'decision'
 
 class Triggers
 
-	link_finder = Regexp::new(/(^http(s?)(www\.)?):\/\/.*\.htm(l?)/)
-
 	@triggers = {
 		"hi #{@name}" => proc { hello },
 		"now quit" => proc { quit },
 		"who is admin?" => proc { Database.is_admin?("#{@user}") },
 		"http" => proc { LinkGrabber.read_HTML(@msg) },
-		"!decide" => proc { Decision.decide },
+		"!decide" => proc { Decision.decide(@msg) },
 		"!8ball" => proc { Decision.eight_ball }
 		}
 
