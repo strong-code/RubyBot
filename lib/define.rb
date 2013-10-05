@@ -14,13 +14,17 @@ class Define
 		part_of_speech = ""
 		definition = ""
 
-
-		url = "http://api.wordnik.com/v4/word.json/#{word}/definitions?limit=3&includeRelated=false&useCanonical=false&includeTags=false&api_key=#{api_key}"
-		resp = Net::HTTP.get(URI(url))
-		resp = JSON.parse(resp)
-		resp.each do |item|
-			definition = item["text"]
-			part_of_speech = item["partOfSpeech"]
+		begin
+			url = "http://api.wordnik.com/v4/word.json/#{word}/definitions?limit=3&includeRelated=false&useCanonical=false&includeTags=false&api_key=#{api_key}"
+			resp = Net::HTTP.get(URI(url))
+			resp = JSON.parse(resp)
+			resp.each do |item|
+				definition = item["text"]
+				part_of_speech = item["partOfSpeech"]
+			end
+		rescue URI::InvalidURIError
+			puts "ERR >> Unable to fetch definition for #{word}"
+			return IRCcommands.say_in_chan("Unable to fetch definition for #{word}")
 		end
 
 		definition = definition[0..150] << "..." if definition.length > 150
