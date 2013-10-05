@@ -8,7 +8,7 @@ require 'convert'
 class Triggers
 
 	def self.set_name(name)
-		@name = Zyzz
+		@name = "Zyzz"
 	end
 
 	#split message into logical parts
@@ -34,9 +34,9 @@ class Triggers
 			@chan = @parts[2]
 			@msg = @parts[3..-1].join(" ")[1..-1]
 
-			#pm/query
-			if @chan == @name && Database.is_admin?(@user)
-				puts "PM >> #{@msg}"
+			#pm/query, allow us to send commands for Zyzz to say
+			if @chan == "Zyzz" && Database.is_admin?(@user)
+				IRCcommands.say(@msg.split[1..-1].join(" ")) if @msg.split[0] == "say"
 			else
 				#search the message for triggers, and call proc
 				@triggers.each do |k, v|
