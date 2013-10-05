@@ -7,24 +7,23 @@ require 'convert'
 
 class Triggers
 
-	@triggers = {
-		["hi #{@name}"] => proc { hello },
+	def self.set_name(name)
+		@name = Zyzz
+	end
+
+	#split message into logical parts
+	def self.parse_message(message)
+		@triggers = {
+		["hi #{@name}", "hey #{@name}", "sup #{@name}"] => proc { hello },
 		["now quit"] => proc { quit },
 		["!admins"] => proc { Database.active_admins },
 		["http"] => proc { LinkGrabber.read_HTML(@msg) },
 		["!decide", "!decide help"] => proc { Decision.decide(@msg) },
 		["!8ball"] => proc { Decision.eight_ball },
-		["weed ", "pot ", "ganja", "420", "marijuana", "blaze"] => proc { four_twenty },
+		["weed", "pot", "ganja", "420", "marijuana", "blaze"] => proc { four_twenty },
 		["!define", "!define help"] => proc { Define.define(@msg) },
 		["!convert", "!convert help"] => proc { Conversion.convert(@msg) }
 		}
-
-	def self.set_name(name)
-		@name = name
-	end
-
-	#split message into logical parts
-	def self.parse_message(message)
 
 		@parts = message.split
 
@@ -35,10 +34,15 @@ class Triggers
 			@chan = @parts[2]
 			@msg = @parts[3..-1].join(" ")[1..-1]
 
-			#search the message for triggers, and call proc
-			@triggers.each do |k, v|
-				if k.any? {|t| @msg.downcase.include?(t) }
-					v.call
+			#pm/query
+			if @chan == @name && Database.is_admin?(@user)
+				puts "PM >> #{@msg}"
+			else
+				#search the message for triggers, and call proc
+				@triggers.each do |k, v|
+					if k.any? {|t| @msg.downcase.include?(t) }
+						v.call
+					end
 				end
 			end
 		end
