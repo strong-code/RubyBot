@@ -18,6 +18,7 @@ class Define
 			url = "http://api.wordnik.com/v4/word.json/#{word}/definitions?limit=3&includeRelated=false&useCanonical=false&includeTags=false&api_key=#{api_key}"
 			resp = Net::HTTP.get(URI(url))
 			resp = JSON.parse(resp)
+
 			resp.each do |item|
 				definition = item["text"]
 				part_of_speech = item["partOfSpeech"]
@@ -29,7 +30,11 @@ class Define
 
 		definition = definition[0..150] << "..." if definition.length > 150
 
-		IRCcommands.say_in_chan("\x02#{word}\x02: (#{part_of_speech}) #{definition}")
+		if definition == ""
+			IRCcommands.say_in_chan("No definition found for \x02#{word}\x02")
+		else
+			IRCcommands.say_in_chan("\x02#{word}\x02: (#{part_of_speech}) #{definition}")
+		end
 	end
 
 	def self.help
