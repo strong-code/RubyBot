@@ -14,7 +14,7 @@ class Triggers
 	#split message into logical parts
 	def self.parse_message(message)
 		@triggers = {
-		["hi #{@name}", "hey #{@name}", "sup #{@name}"] => proc { hello },
+		#["hi #{@name}", "hey #{@name}", "sup #{@name}"] => proc { hello },
 		["now quit"] => proc { quit },
 		["!admins"] => proc { Database.active_admins },
 		["http"] => proc { LinkGrabber.read_HTML(@msg) },
@@ -36,8 +36,12 @@ class Triggers
 
 			#pm/query, allow us to send commands for Zyzz to say
 			if @chan == @name && Database.is_admin?(@user)
-				IRCcommands.say(@msg.split[1..].join(" ")) if @msg.split[0] == "say"
+				IRCcommands.say(@msg.split[1..-1].join(" ")) if @msg.split[0] == "say"
 			else
+				if @msg == @msg.upcase && !(@msg.include?("VERSION")) #ignore version requests
+					Database.add_uppercase_quote(@user, @msg)
+					Database.get_uppercase_quote
+				end
 				#search the message for triggers, and call proc
 				@triggers.each do |k, v|
 					if k.any? {|t| @msg.downcase.include?(t) }
