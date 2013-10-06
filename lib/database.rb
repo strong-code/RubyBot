@@ -12,6 +12,7 @@ class Database
 		admins_prep.execute(admin_hostmask)
 	end
 
+	#Display the active admins (hostmasks) for the bot
 	def self.active_admins
 		admins = []
 
@@ -22,6 +23,7 @@ class Database
 		IRCcommands.say_in_chan(admins.join(", "))
 	end
 
+	#Return boolean value if user(name) is currently ignored
 	def self.is_ignored?(user)
 		user = /:(.*)!/.match(user)[1].rstrip
 
@@ -36,6 +38,7 @@ class Database
 		false
 	end
 
+	#Allow an active admin to add a user(name) to the ignore list
 	def self.ignore_user(user, admin)
 		if is_admin?(admin)
 			stm = @@db.prepare("INSERT OR IGNORE INTO Ignored (user) VALUES (?)")
@@ -44,6 +47,7 @@ class Database
 		end
 	end
 
+	#Allow an active admin to remove a user(name) from the ignore list
 	def self.unignore_user(user, admin)
 		if is_admin?(admin)
 			stm = @@db.prepare("DELETE FROM Ignored WHERE user = ?")
@@ -52,6 +56,7 @@ class Database
 		end
 	end
 
+	#Display currently ignore users
 	def self.list_ignored_users
 		ignored_users = []
 
@@ -69,6 +74,7 @@ class Database
 		end
 	end
 
+	#Insert an ALLCAPS QUOTE to the database
 	def self.add_uppercase_quote(user, quote)
 		user = /:(.*)!/.match(user)[1] 
 		stm = @@db.prepare("INSERT OR IGNORE INTO Uppercase (user, quote) VALUES (?, ?)")
@@ -76,6 +82,7 @@ class Database
 		stm.execute(user, quote)
 	end
 
+	#Return an ALLCAPS QUOTE from the database and say it
 	def self.get_uppercase_quote
 		stm = @@db.prepare("SELECT quote FROM Uppercase ORDER BY RANDOM() LIMIT 1")
 		result = stm.execute
@@ -85,6 +92,7 @@ class Database
 		end
 	end
 
+	#Return a boolean value if user (hostmask) is an admin
 	def self.is_admin?(username)
 		hostmask = /.*@(.*)/.match(username)[1].to_s
 
