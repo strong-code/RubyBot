@@ -22,7 +22,10 @@ class Triggers
 		["!8ball"] => proc { Decision.eight_ball },
 		["weed", "pot", "ganja", "420", "marijuana", "blaze"] => proc { four_twenty },
 		["!define", "!define help"] => proc { Define.define(@msg) },
-		["!convert", "!convert help"] => proc { Conversion.convert(@msg) }
+		["!convert", "!convert help"] => proc { Conversion.convert(@msg) },
+		["!list ignored"] => proc { Database.list_ignored_users },
+		["!ignore"] => proc { Database.ignore_user(@msg.split[1]) },
+		["!unignore"] => proc { Database.unignore_user(@msg.split[1])}
 		}
 
 		@parts = message.split
@@ -37,8 +40,10 @@ class Triggers
 			#pm/query, allow us to send commands for Zyzz to say
 			if @chan == @name && Database.is_admin?(@user)
 				IRCcommands.say(@msg.split[1..-1].join(" ")) if @msg.split[0] == "say"
-			else
-				if @msg == @msg.upcase && !(@msg.include?("VERSION")) #ignore version requests
+			end
+			
+			if !(Database.is_ignored?(@user))
+				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]*$/.match(@msg) != nil && !(@msg.include?("VERSION")) && @msg.length > 3 
 					Database.add_uppercase_quote(@user, @msg)
 					Database.get_uppercase_quote
 				end
