@@ -24,8 +24,8 @@ class Triggers
 		["!define", "!define help"] => proc { Define.define(@msg) },
 		["!convert", "!convert help"] => proc { Conversion.convert(@msg) },
 		["!list ignored"] => proc { Database.list_ignored_users },
-		["!ignore"] => proc { Database.ignore_user(@msg.split[1]) },
-		["!unignore"] => proc { Database.unignore_user(@msg.split[1])}
+		["!ignore"] => proc { Database.ignore_user(@msg.split[1], @user) },
+		["!unignore"] => proc { Database.unignore_user(@msg.split[1], @user) }
 		}
 
 		@parts = message.split
@@ -41,7 +41,7 @@ class Triggers
 			if @chan == @name && Database.is_admin?(@user)
 				IRCcommands.say(@msg.split[1..-1].join(" ")) if @msg.split[0] == "say"
 			end
-			
+
 			if !(Database.is_ignored?(@user))
 				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]*$/.match(@msg) != nil && !(@msg.include?("VERSION")) && @msg.length > 3 
 					Database.add_uppercase_quote(@user, @msg)

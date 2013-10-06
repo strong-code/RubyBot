@@ -36,16 +36,20 @@ class Database
 		false
 	end
 
-	def self.ignore_user(user)
-		stm = @@db.prepare("INSERT OR IGNORE INTO Ignored (user) VALUES (?)")
-		stm.execute(user)
-		IRCcommands.say_in_chan("I am now ignoring #{user}")
+	def self.ignore_user(user, admin)
+		if is_admin?(admin)
+			stm = @@db.prepare("INSERT OR IGNORE INTO Ignored (user) VALUES (?)")
+			stm.execute(user)
+			IRCcommands.say_in_chan("I am now ignoring \x02#{user}\x02")
+		end
 	end
 
-	def self.unignore_user(user)
-		stm = @@db.prepare("DELETE FROM Ignored WHERE user = ?")
-		stm.execute(user)
-		return IRCcommands.say_in_chan("No longer ignoring #{user}")
+	def self.unignore_user(user, admin)
+		if is_admin?(admin)
+			stm = @@db.prepare("DELETE FROM Ignored WHERE user = ?")
+			stm.execute(user)
+			return IRCcommands.say_in_chan("No longer ignoring \x02#{user}\x02")
+		end
 	end
 
 	def self.list_ignored_users
