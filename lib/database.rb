@@ -8,6 +8,7 @@ class Database
 		@@db.execute("CREATE TABLE IF NOT EXISTS Admins (id INTEGER PRIMARY KEY, hostmask TEXT UNIQUE NOT NULL, isadmin BOOLEAN)")
 		@@db.execute("CREATE TABLE IF NOT EXISTS Uppercase (id INTEGER PRIMARY KEY, user TEXT NOT NULL, quote TEXT UNIQUE)")
 		@@db.execute("CREATE TABLE IF NOT EXISTS Ignored (id INTEGER PRIMARY KEY, user TEXT UNIQUE NOT NULL)")
+		@@db.execute("CREATE TABLE IF NOT EXISTS Quotes (id INTEGER PRIMARY KEY, addedby TEXT NOT NULL, quote TEXT UNIQUE NOT NULL)")
 		admins_prep = @@db.prepare("INSERT OR IGNORE INTO Admins (hostmask, isadmin) VALUES (?, 1)")
 		admins_prep.execute(admin_hostmask)
 	end
@@ -74,6 +75,42 @@ class Database
 		end
 	end
 
+	#Return a random quote
+	def self.rand_quote
+		stm = @@db.prepare("SELECT quote FROM Quotes ORDER BY RANDOM() LIMIT 1")
+		result = stm.execute
+		result.each do |quote|
+			return quote[0]
+		end
+	end
+
+	#Return a quote corresponding to the supplied primary key ID
+	def self.get_quote(quote_id)
+		stm = @@db.prepare("SELECT quote FROM Quotes WHERE id = ?")
+		result = stm.execute(quote_id)
+		result.each do |quote|
+			return quote[0]
+		end
+	end
+
+	#Add a quote to the database
+	def self.add_quote(user, quote)
+		user = /:(.*)!/.match(user)[1]
+		stm = @@db.prepare("INSERT OR IGNORE INTO Quotes (addedby, quote) VALUES (?, ?)")
+		stm.execute(user, quote)
+		quote_id = @@db.execute("SELECT last_insert_rowid();")
+		puts "INFO >> Quote #{quote_id[0][0]} to table Quotes by #{user}"
+		return quote_id[0][0]
+	end
+
+	#Remove a selected quote from the database
+	def self.remove_quote(user, quote_id)
+		user = /:(.*)!/.match(user)[1]
+		stm = @@db.prepare("DELETE FROM Quotes WHERE id = ?")
+		puts "INFO >> #{user} removed quote ##{quote_id} from the database" 
+		stm.execute(quote_id)
+	end
+
 	#Insert an ALLCAPS QUOTE to the database
 	def self.add_uppercase_quote(user, quote)
 		user = /:(.*)!/.match(user)[1] 
@@ -99,10 +136,8 @@ class Database
 		result = @@db.execute("SELECT isadmin, hostmask FROM Admins")
 		result.each do |entry|
 			return true if entry[0] == 1 && entry[1] == hostmask
-			#IRCcommands.say_in_chan("#{username} is an admin") if entry[0] == 1 && entry[1] == hostmask
 		end
 		return false
 	end
-
 
 end

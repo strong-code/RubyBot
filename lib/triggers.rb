@@ -4,6 +4,7 @@ require 'link_grabber'
 require 'decision'
 require 'define'
 require 'convert'
+require 'quotes'
 
 class Triggers
 
@@ -20,12 +21,14 @@ class Triggers
 		["http"] => proc { LinkGrabber.read_HTML(@msg) },
 		["!decide", "!decide help"] => proc { Decision.decide(@msg) },
 		["!8ball"] => proc { Decision.eight_ball },
-		["weed", "pot", "ganja", "420", "marijuana", "blaze"] => proc { four_twenty },
+		#["weed", "pot", "ganja", "420", "marijuana", "blaze"] => proc { four_twenty },
 		["!define", "!define help"] => proc { Define.define(@msg) },
 		["!convert", "!convert help"] => proc { Conversion.convert(@msg) },
 		["!list ignored"] => proc { Database.list_ignored_users },
 		["!ignore"] => proc { Database.ignore_user(@msg.split[1], @user) },
-		["!unignore"] => proc { Database.unignore_user(@msg.split[1], @user) }
+		["!unignore"] => proc { Database.unignore_user(@msg.split[1], @user) },
+		["!yell"] => proc { Database.get_uppercase_quote() },
+		["!quote"] => proc { Quotes.handle_quote(@msg, @user) }
 		}
 
 		@parts = message.split
