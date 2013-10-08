@@ -12,8 +12,8 @@ class Conversion
 			else
 				convert_to_kg(weight.to_i)
 			end
-		rescue Error
-			puts "ERR >> #{Error}"
+		rescue
+			puts "ERR >> unable to convert #{weight}"
 		end
 	end
 
