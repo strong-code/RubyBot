@@ -17,6 +17,7 @@ class IRCBot
 		IRCcommands.say "NICK #{name}"
 		IRCcommands.say "GHOST #{@@name} #{ARGV[0]}"
 		IRCcommands.say "IDENTIFY #{ARGV[0]}"
+		Triggers.set_name(@name)
 		IRCcommands.join_chan(@@channel)
 		Database.setup_database(@@name, ARGV[1])
 	end
@@ -50,5 +51,5 @@ class IRCBot
 end
 
 
-bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'bptest')
+bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'lifting')
 bot.run

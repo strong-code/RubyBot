@@ -14,8 +14,6 @@ class Quotes
 			read_quote(msg[2])
 		elsif msg[1].downcase == "help"
 			help
-		else
-			IRCcommands.say_in_chan("Improper !quote usage. Type \x02!quote help\x02 to view usage instructions.")
 		end
 
 		#only admins can add and remove
