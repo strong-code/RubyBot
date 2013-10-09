@@ -27,7 +27,7 @@ class Quotes
 
 	end
 
-	def self.add_quote(user, quote)
+	def self.add_quote(user, quote)	
 		quote_id = Database.add_quote(user, quote)
 		IRCcommands.say_in_chan("Quote \x02##{quote_id}\x02 added")
 	end

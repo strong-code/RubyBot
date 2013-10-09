@@ -48,7 +48,7 @@ class Triggers
 			end
 
 			if !(Database.is_ignored?(@user))
-				if /[A-Z]{3,}[\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]*$/.match(@msg) != nil && !(@msg.include?("VERSION")) 
+				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]{3,}$/.match(@msg) != nil && !(@msg.include?("VERSION")) 
 					Database.add_uppercase_quote(@user, @msg)
 					Database.get_uppercase_quote
 				end
