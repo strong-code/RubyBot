@@ -4,10 +4,13 @@ require 'irc_commands'
 class LinkGrabber
 
 	#open and read HTML from a given url
-	def self.read_HTML(url, limit = 10)
-		return if /\.(jpg|jpeg|bmp|png|tiff|gif$)/.match(url) != nil
+	def self.read_HTML(msg, limit = 10)
+		#ignore images, no page titles there
+		return if /\.(jpg|jpeg|bmp|png|tiff|gif$)/.match(msg) != nil
 
-		url = url.sub(/^https/, "http") if url.include?("https")
+		#find the url in the string, change HTTPS to HTTP because Net::HTTP is cheeky
+		url = ""
+		msg.split.each { |w| url = w.sub(/^https/, "http") if w.include?("http") }
 
 		if limit == 0
 			puts "ERR >> Redirected too many times, failed to fetch HTML"
@@ -17,7 +20,7 @@ class LinkGrabber
 		begin
 			response = Net::HTTP.get_response(URI(url))
 		rescue URI::InvalidURIError
-			puts "ERR >> Invalide URI: #{url}"
+			puts "ERR >> Invalid URI: #{url}"
 			return
 		end
 
