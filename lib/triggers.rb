@@ -5,6 +5,7 @@ require 'decision'
 require 'define'
 require 'convert'
 require 'quotes'
+require 'youtube'
 
 class Triggers
 
@@ -28,7 +29,8 @@ class Triggers
 		["!ignore"] => proc { Database.ignore_user(@msg.split[1], @user) },
 		["!unignore"] => proc { Database.unignore_user(@msg.split[1], @user) },
 		["!yell"] => proc { Database.get_uppercase_quote() },
-		["!quote"] => proc { Quotes.handle_quote(@msg, @user) }
+		["!quote"] => proc { Quotes.handle_quote(@msg, @user) },
+		["!yt"] => proc { Youtube.search(@msg) }
 		}
 
 		@parts = message.split
@@ -46,7 +48,7 @@ class Triggers
 			end
 
 			if !(Database.is_ignored?(@user))
-				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]*$/.match(@msg) != nil && !(@msg.include?("VERSION")) && @msg.length > 3 
+				if /[A-Z]{3,}[\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]*$/.match(@msg) != nil && !(@msg.include?("VERSION")) 
 					Database.add_uppercase_quote(@user, @msg)
 					Database.get_uppercase_quote
 				end
