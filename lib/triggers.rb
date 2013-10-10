@@ -17,8 +17,8 @@ class Triggers
 	def self.parse_message(message)
 		@triggers = {
 		#["hi #{@name}", "hey #{@name}", "sup #{@name}"] => proc { hello },
-		["now quit"] => proc { quit },
-		["!admins"] => proc { Database.active_admins },
+		["now quit"] => proc { IRCcommands.quit(@user) },
+		["!admin"] => proc { IRCcommands.admin(@msg, @user) },
 		["http"] => proc { LinkGrabber.read_HTML(@msg) },
 		["!decide", "!decide help"] => proc { Decision.decide(@msg) },
 		["!8ball"] => proc { Decision.eight_ball },
@@ -48,7 +48,7 @@ class Triggers
 			end
 
 			if !(Database.is_ignored?(@user))
-				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]{3,}$/.match(@msg) != nil && !(@msg.include?("VERSION")) 
+				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]{4,}$/.match(@msg) != nil && !(@msg.include?("VERSION")) 
 					Database.add_uppercase_quote(@user, @msg)
 					Database.get_uppercase_quote
 				end
@@ -67,16 +67,6 @@ class Triggers
 		responses = ["hi", "hello", "sup", "hej", "hola", "yo", "hey"]
 		name = /(.*)\!/.match(@user).to_s.chomp("!")[1..-1]
 		IRCcommands.say_in_chan(responses.sample + " #{name}")
-	end
-
-	#quit with default message if nothing is supplied
-	def self.quit(quitmsg = "cya nerds")
-		if Database.is_admin?(@user)
-			IRCcommands.say_in_chan quitmsg
-			say "QUIT"
-		else
-			IRCcommands.say_in_chan("You aren't allowed to issue that command, sorry")
-		end
 	end
 
 	#the worst trigger ever made in the history of irc
