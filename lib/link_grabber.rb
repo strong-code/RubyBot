@@ -22,6 +22,9 @@ class LinkGrabber
 		rescue URI::InvalidURIError
 			puts "ERR >> Invalid URI: #{url}"
 			return
+		rescue
+			#catch-em-all :^)
+			return
 		end
 
 		case response
