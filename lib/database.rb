@@ -3,25 +3,12 @@ require 'irc_commands'
 
 class Database
 
-	def self.setup_database(name, admin_hostmask)
+	def self.setup_database
 		@@db = SQLite3::Database.new("rubybot.database")
-		@@db.execute("CREATE TABLE IF NOT EXISTS Admins (id INTEGER PRIMARY KEY, hostmask TEXT UNIQUE NOT NULL, isadmin BOOLEAN)")
+		@@db.execute("CREATE TABLE IF NOT EXISTS Admins (id INTEGER PRIMARY KEY, user TEXT UNIQUE NOT NULL)")
 		@@db.execute("CREATE TABLE IF NOT EXISTS Uppercase (id INTEGER PRIMARY KEY, user TEXT NOT NULL, quote TEXT UNIQUE)")
 		@@db.execute("CREATE TABLE IF NOT EXISTS Ignored (id INTEGER PRIMARY KEY, user TEXT UNIQUE NOT NULL)")
 		@@db.execute("CREATE TABLE IF NOT EXISTS Quotes (id INTEGER PRIMARY KEY, addedby TEXT NOT NULL, quote TEXT UNIQUE NOT NULL)")
-		admins_prep = @@db.prepare("INSERT OR IGNORE INTO Admins (hostmask, isadmin) VALUES (?, 1)")
-		admins_prep.execute(admin_hostmask)
-	end
-
-	#Display the active admins (hostmasks) for the bot
-	def self.active_admins
-		admins = []
-
-		resp = @@db.execute("SELECT * FROM Admins WHERE isadmin = ?", 1)
-		resp.each do |entry|
-			admins << entry[1]
-		end
-		IRCcommands.say_in_chan(admins.join(", "))
 	end
 
 	#Return boolean value if user(name) is currently ignored
@@ -129,14 +116,41 @@ class Database
 		end
 	end
 
-	#Return a boolean value if user (hostmask) is an admin
-	def self.is_admin?(username)
-		hostmask = /.*@(.*)/.match(username)[1].to_s
+	#Return an array of admins for the bot
+	def self.active_admins
+		admins = []
 
-		result = @@db.execute("SELECT isadmin, hostmask FROM Admins")
-		result.each do |entry|
-			return true if entry[0] == 1 && entry[1] == hostmask
+		resp = @@db.execute("SELECT * FROM Admins")
+		resp.each do |entry|
+			admins << entry[1]
 		end
+		admins
+	end
+
+	#Add a user as an admin to the DB
+	def self.add_admin(user)
+		stm = @@db.prepare("INSERT OR IGNORE INTO Admins (user) VALUES (?)")
+		stm.execute(user)
+		puts "INFO >> User #{user} added to admin table"
+	end
+
+	#Remove a user as an admin from the DB
+	def self.remove_admin(user)
+		stm = @@db.prepare("DELETE FROM Admins WHERE user = ?")
+		stm.execute(user)
+		puts "INFO >>> #{user} removed from admin table"
+	end
+
+	#Return a boolean value if user is an admin
+	def self.is_admin?(user)
+		user = user[1..-1]
+		stm = @@db.prepare("SELECT * FROM Admins")
+		result = stm.execute
+
+		result.each do |entry|
+			return true if entry[1] == user
+		end
+
 		return false
 	end
 
