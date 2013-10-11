@@ -15,11 +15,10 @@ class IRCBot
 		IRCcommands.set_class_vars(@@socket, channel, name)
 		IRCcommands.say "USER #{name} 0 * #{name}"
 		IRCcommands.say "NICK #{name}"
-		IRCcommands.say "GHOST #{@@name} #{ARGV[0]}"
 		IRCcommands.say "IDENTIFY #{ARGV[0]}"
-		Triggers.set_name(@name)
+		Triggers.set_name(@@name)
 		IRCcommands.join_chan(@@channel)
-		Database.setup_database(@@name, ARGV[1])
+		Database.setup_database
 	end
 
 	def run
@@ -27,29 +26,24 @@ class IRCBot
 			message = @@socket.gets
 			puts 'SERV << ' + message
 
-			if message.include?("PING")
-				IRCcommands.pong
-			end
-
-			#Have to do this to load hostmask but whatever
-			if message.include?(':Password accepted') and @inChan == true
-				IRCcommands.cycle(@@channel)
-			end
-
-			#kind of a hackish way to determine but it works
-			if message.include?('366')
-				@inChan = true
-				puts 'INFO >> Joined channel successfuly'
-			end
-
-			if @inChan
+			if !@inChan
+				#kind of a hackish way to determine but it works
+				if message.include?('366')
+					@inChan = true
+					IRCcommands.cycle(@@channel)
+					puts 'INFO >> Joined channel successfuly'
+				end
+			else
 				Triggers.parse_message(message)
+
+				if message.include?("PING")
+					IRCcommands.pong
+				end
 			end
 			
 		end
 	end
 end
-
 
 bot = IRCBot.new('Zyzz', "irc.rizon.net", 6667, 'lifting')
 bot.run
