@@ -28,7 +28,6 @@ class Triggers
 		["!list ignored"] => proc { Database.list_ignored_users },
 		["!ignore"] => proc { Database.ignore_user(@msg.split[1], @user) },
 		["!unignore"] => proc { Database.unignore_user(@msg.split[1], @user) },
-		["!yell"] => proc { Database.get_uppercase_quote() },
 		["!quote"] => proc { Quotes.handle_quote(@msg, @user) },
 		["!yt"] => proc { Youtube.search(@msg) },
 		["!last"] => proc { IRCcommands.say_in_chan("#{@last_caps_quote_user} said that") if not nil }
@@ -49,7 +48,7 @@ class Triggers
 			end
 
 			if !(Database.is_ignored?(@user))
-				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]{4,}$/.match(@msg) != nil && !(@msg.include?("VERSION"))
+				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]{4,}$/.match(@msg) != nil && !(@msg.include?("VERSION")) || @msg.include?("!yell")
 					Database.add_uppercase_quote(@user, @msg)
 					caps_quote = Database.get_uppercase_quote
 					@last_caps_quote_user = caps_quote[0]
