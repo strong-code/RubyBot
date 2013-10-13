@@ -108,11 +108,11 @@ class Database
 
 	#Return an ALLCAPS QUOTE from the database and say it
 	def self.get_uppercase_quote
-		stm = @@db.prepare("SELECT quote FROM Uppercase ORDER BY RANDOM() LIMIT 1")
+		stm = @@db.prepare("SELECT * FROM Uppercase ORDER BY RANDOM() LIMIT 1")
 		result = stm.execute
 		#hacky but we're limiting the statement to 1 so it doesn't matter really
 		result.each do |entry|
-			return IRCcommands.say_in_chan(entry[0])
+			return [entry[1], entry[2]]
 		end
 	end
 

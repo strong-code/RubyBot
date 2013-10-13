@@ -30,7 +30,8 @@ class Triggers
 		["!unignore"] => proc { Database.unignore_user(@msg.split[1], @user) },
 		["!yell"] => proc { Database.get_uppercase_quote() },
 		["!quote"] => proc { Quotes.handle_quote(@msg, @user) },
-		["!yt"] => proc { Youtube.search(@msg) }
+		["!yt"] => proc { Youtube.search(@msg) },
+		["!last"] => proc { IRCcommands.say_in_chan("#{@last_caps_quote_user} said that") if not nil }
 		}
 
 		@parts = message.split
@@ -48,9 +49,11 @@ class Triggers
 			end
 
 			if !(Database.is_ignored?(@user))
-				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]{4,}$/.match(@msg) != nil && !(@msg.include?("VERSION")) 
+				if /^[A-Z\d;:\-\!\#\*()`'",\/<>@%\$\^\+\=\~\s*]{4,}$/.match(@msg) != nil && !(@msg.include?("VERSION"))
 					Database.add_uppercase_quote(@user, @msg)
-					Database.get_uppercase_quote
+					caps_quote = Database.get_uppercase_quote
+					@last_caps_quote_user = caps_quote[0]
+					IRCcommands.say_in_chan(caps_quote[1])
 				end
 				#search the message for triggers, and call proc
 				@triggers.each do |k, v|
