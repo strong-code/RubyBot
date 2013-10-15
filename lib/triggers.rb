@@ -19,7 +19,7 @@ class Triggers
 		#["hi #{@name}", "hey #{@name}", "sup #{@name}"] => proc { hello },
 		["now quit"] => proc { IRCcommands.quit(@user) },
 		["!admin"] => proc { IRCcommands.admin(@msg, @user) },
-		["http"] => proc { LinkGrabber.read_HTML(@msg) },
+		["http", "www."] => proc { LinkGrabber.read_HTML(@msg) },
 		["!decide", "!decide help"] => proc { Decision.decide(@msg) },
 		["!8ball"] => proc { Decision.eight_ball },
 		#["weed", "pot", "ganja", "420", "marijuana", "blaze"] => proc { four_twenty },
