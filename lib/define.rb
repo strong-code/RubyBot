@@ -15,7 +15,7 @@ class Define
 		definition = ""
 
 		begin
-			url = "http://api.wordnik.com/v4/word.json/#{word}/definitions?limit=3&includeRelated=false&useCanonical=false&includeTags=false&api_key=#{api_key}"
+			url = "http://api.wordnik.com/v4/word.json/#{word}/definitions?limit=3&includeRelated=false&&sourceDictionaries=webster&useCanonical=false&includeTags=false&api_key=#{api_key}"
 			resp = Net::HTTP.get(URI(url))
 			resp = JSON.parse(resp)
 
