@@ -5,6 +5,7 @@ class Quotes
 
 	def self.handle_quote(msg, user)
 		msg = msg.split
+		return if msg.length == 1
 		quote = msg[2..-1].join(" ")
 
 		#all users can use rand, read and help
